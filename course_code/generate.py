@@ -92,7 +92,8 @@ if __name__ == "__main__":
 
     parser.add_argument("--model_name", type=str, default="vanilla_baseline",
                         choices=["vanilla_baseline",
-                                 "rag_baseline"
+                                 "rag_baseline", 
+                                 "chunk_threshold"
                                  # add your model here
                                  ],
                         )
@@ -100,6 +101,8 @@ if __name__ == "__main__":
     parser.add_argument("--llm_name", type=str, default="meta-llama/Llama-3.2-3B-Instruct",
                         choices=["meta-llama/Llama-3.2-3B-Instruct",
                                  "meta-llama/Llama-3.2-1B-Instruct",
+                                 "meta-llama/Llama-3.2-8B-Instruct",
+                                 "meta-llama/Llama-3.2-11B-Vision-Instruct",
                                  "google/gemma-2-2b-it",
                                  # can add more llm models here
                                  ])
@@ -129,6 +132,9 @@ if __name__ == "__main__":
         from vanilla_baseline import InstructModel
         model = InstructModel(llm_name=llm_name, is_server=args.is_server, vllm_server=args.vllm_server)
     elif model_name == "rag_baseline":
+        from rag_baseline import RAGModel
+        model = RAGModel(llm_name=llm_name, is_server=args.is_server, vllm_server=args.vllm_server)
+    elif model_name == "chunk_threshold":
         from rag_baseline import RAGModel
         model = RAGModel(llm_name=llm_name, is_server=args.is_server, vllm_server=args.vllm_server)
     # elif model_name == "your_model":
