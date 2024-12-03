@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--dataset_path", type=str, default="example_data/dev_data.jsonl.bz2",
                         choices=["example_data/dev_data.jsonl.bz2", # example data
-                                 "data/crag_task_1_dev_v4_release.jsonl.bz2", # full data
+                                 "../../../../data/crag_task_1_dev_v4_release.jsonl.bz2", # full data
                                  ])
     parser.add_argument("--split", type=int, default=-1,
                         help="The split of the dataset to use. This is only relevant for the full data: "
@@ -99,6 +99,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--llm_name", type=str, default="meta-llama/Llama-3.2-3B-Instruct",
                         choices=["meta-llama/Llama-3.2-3B-Instruct",
+                                 "meta-llama/Llama-3.2-1B-Instruct",
                                  "google/gemma-2-2b-it",
                                  # can add more llm models here
                                  ])
