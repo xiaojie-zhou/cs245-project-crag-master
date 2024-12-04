@@ -135,7 +135,7 @@ if __name__ == "__main__":
         from rag_baseline import RAGModel
         model = RAGModel(llm_name=llm_name, is_server=args.is_server, vllm_server=args.vllm_server)
     elif model_name == "chunk_threshold":
-        from rag_baseline import RAGModel
+        from chunk_threshold import RAGModel
         model = RAGModel(llm_name=llm_name, is_server=args.is_server, vllm_server=args.vllm_server)
     # elif model_name == "your_model":
     #     add your model here
