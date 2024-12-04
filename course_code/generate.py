@@ -1,6 +1,8 @@
+
 import bz2
 import json
 import os
+
 from datetime import datetime
 import argparse
 
@@ -84,7 +86,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--dataset_path", type=str, default="example_data/dev_data.jsonl.bz2",
                         choices=["example_data/dev_data.jsonl.bz2", # example data
-                                 "../../../../data/crag_task_1_dev_v4_release.jsonl.bz2", # full data
+                                 "/data/crag_task_1_dev_v4_release.jsonl.bz2", # full data
                                  ])
     parser.add_argument("--split", type=int, default=-1,
                         help="The split of the dataset to use. This is only relevant for the full data: "
@@ -92,7 +94,8 @@ if __name__ == "__main__":
 
     parser.add_argument("--model_name", type=str, default="vanilla_baseline",
                         choices=["vanilla_baseline",
-                                 "rag_baseline"
+                                 "rag_baseline",
+                                 "file_levl_rag"
                                  # add your model here
                                  ],
                         )
@@ -131,8 +134,9 @@ if __name__ == "__main__":
     elif model_name == "rag_baseline":
         from rag_baseline import RAGModel
         model = RAGModel(llm_name=llm_name, is_server=args.is_server, vllm_server=args.vllm_server)
-    # elif model_name == "your_model":
-    #     add your model here
+    elif model_name == "file_levl_rag":
+        from file_levl_rag import RAGModel
+        model = RAGModel(llm_name=llm_name, is_server=args.is_server, vllm_server=args.vllm_server)
     else:
         raise ValueError("Model name not recognized.")
 
