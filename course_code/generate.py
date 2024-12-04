@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--dataset_path", type=str, default="example_data/dev_data.jsonl.bz2",
                         choices=["example_data/dev_data.jsonl.bz2", # example data
-                                 "data/crag_task_1_dev_v4_release.jsonl.bz2", # full data
+                                 "/data/crag_task_1_dev_v4_release.jsonl.bz2", # full data
                                  ])
     parser.add_argument("--split", type=int, default=-1,
                         help="The split of the dataset to use. This is only relevant for the full data: "
@@ -92,13 +92,14 @@ if __name__ == "__main__":
 
     parser.add_argument("--model_name", type=str, default="vanilla_baseline",
                         choices=["vanilla_baseline",
-                                 "rag_baseline"
-                                 # add your model here
+                                 "rag_baseline",
+                                 "rag_enhanced"
                                  ],
                         )
 
     parser.add_argument("--llm_name", type=str, default="meta-llama/Llama-3.2-3B-Instruct",
                         choices=["meta-llama/Llama-3.2-3B-Instruct",
+                                 "meta-llama/Llama-3.2-1B-Instruct",
                                  "google/gemma-2-2b-it",
                                  # can add more llm models here
                                  ])
@@ -130,8 +131,9 @@ if __name__ == "__main__":
     elif model_name == "rag_baseline":
         from rag_baseline import RAGModel
         model = RAGModel(llm_name=llm_name, is_server=args.is_server, vllm_server=args.vllm_server)
-    # elif model_name == "your_model":
-    #     add your model here
+    elif model_name == "rag_enhanced":
+        from rag_enhanced import EnhancedRAGModel
+        model = EnhancedRAGModel(llm_name=llm_name, is_server=args.is_server, vllm_server=args.vllm_server)
     else:
         raise ValueError("Model name not recognized.")
 
