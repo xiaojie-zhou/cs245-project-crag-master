@@ -115,7 +115,7 @@ if __name__ == "__main__":
     print(args.is_server)
 
     dataset_path = args.dataset_path
-    dataset = dataset_path.split("/")[0]
+    dataset = dataset_path.split("/")[4]
     split = -1
     if dataset == "data":
         split = args.split
