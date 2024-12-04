@@ -18,7 +18,7 @@ from tqdm import tqdm
 #### CONFIG PARAMETERS ---
 
 # Define the number of context sentences to consider for generating an answer.
-NUM_CONTEXT_SENTENCES = 40
+NUM_CONTEXT_SENTENCES = 20
 # Set the maximum length for each context sentence (in characters).
 MAX_CONTEXT_SENTENCE_LENGTH = 1000
 # Set the maximum context references length (in characters).
@@ -29,7 +29,7 @@ AICROWD_SUBMISSION_BATCH_SIZE = 1 # TUNE THIS VARIABLE depending on the number o
 
 # VLLM Parameters 
 VLLM_TENSOR_PARALLEL_SIZE = 1 # TUNE THIS VARIABLE depending on the number of GPUs you are requesting and the size of your model.
-VLLM_GPU_MEMORY_UTILIZATION = 0.65 # TUNE THIS VARIABLE depending on the number of GPUs you are requesting and the size of your model.
+VLLM_GPU_MEMORY_UTILIZATION = 0.5 # TUNE THIS VARIABLE depending on the number of GPUs you are requesting and the size of your model.
 
 # Sentence Transformer Parameters
 SENTENTENCE_TRANSFORMER_BATCH_SIZE = 8 # TUNE THIS VARIABLE depending on the size of your embedding model and GPU mem available
@@ -173,7 +173,7 @@ class RAGModel:
     An example RAGModel for the KDDCup 2024 Meta CRAG Challenge
     which includes all the key components of a RAG lifecycle.
     """
-    def __init__(self, llm_name="meta-llama/Llama-3.2-3B-Instruct", is_server=False, vllm_server=None):
+    def __init__(self, llm_name="meta-llama/Llama-3.2-1B-Instruct", is_server=False, vllm_server=None):
         self.initialize_models(llm_name, is_server, vllm_server)
         self.initialize_summarizer()
         self.chunk_extractor = ChunkExtractor()
@@ -214,7 +214,7 @@ class RAGModel:
 
     def initialize_summarizer(self):
         #print(os.environ["CUDA_VISIBLE_DEVICES"])
-        model_id = "meta-llama/Llama-3.2-3B-Instruct"
+        model_id = "meta-llama/Llama-3.2-1B-Instruct"
         self.summarize_pipe = pipeline(
             "text-generation",
             model=model_id,
@@ -223,19 +223,20 @@ class RAGModel:
         )
 
     def classify_files(self, files):
-        summaries = self.summarize_pipe(
+        """summaries = self.summarize_pipe(
             [summarize_prompt(file) for file in files],
             max_new_tokens=256,
             pad_token_id=self.summarize_pipe.tokenizer.eos_token_id
         )
-        #print(len(summaries))
-        #print(summaries[0][-1])
-        #print(type(summaries[0][-1]))
-        #print(summaries[0][-1]["generated_text"][-1]["content"])
         summaries = [summary[-1]["generated_text"][-1]["content"] for summary in summaries]
-        #pprint(summaries)
         topics = self.summarize_pipe(
             [classify_prompt(summary) for summary in summaries],
+            max_new_tokens=256,
+            pad_token_id=self.summarize_pipe.tokenizer.eos_token_id
+        )
+        topics = [topic[-1]["generated_text"][-1]["content"] for topic in topics]"""
+        topics = self.summarize_pipe(
+            [classify_prompt(file) for file in files],
             max_new_tokens=256,
             pad_token_id=self.summarize_pipe.tokenizer.eos_token_id
         )
