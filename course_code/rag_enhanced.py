@@ -1,3 +1,4 @@
+import logging
 import os
 from collections import defaultdict
 from typing import Any, Dict, List
@@ -129,8 +130,8 @@ class ChunkExtractor:
 
 class EnhancedRAGModel:
     """
-    An enhanced RAGModel that incorporates enhanced chunking, better embeddings, FAISS indexing,
-    cross-encoder re-ranking, and refined prompt engineering.
+    An enhanced RAGModel that incorporates improved chunking, better embeddings, FAISS indexing,
+    cross-encoder re-ranking, refined prompt engineering, and answer verification.
     """
     def __init__(self, llm_name="meta-llama/Llama-3.2-3B-Instruct", is_server=False, vllm_server=None):
         self.initialize_models(llm_name, is_server, vllm_server)
@@ -169,10 +170,8 @@ class EnhancedRAGModel:
 
         # Load a more powerful sentence transformer model
         self.sentence_model = SentenceTransformer(
-            "all-mpnet-base-v2",
-            device=torch.device(
-                "cuda" if torch.cuda.is_available() else "cpu"
-            ),
+            "all-roberta-large-v1",  # Upgraded embedding model
+            device=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
         )
 
         # Load a cross-encoder for re-ranking
@@ -250,6 +249,14 @@ class EnhancedRAGModel:
             if retrieval_results:
                 retrieval_results = self.rerank_chunks(query, retrieval_results)
 
+            # Add debugging messages here
+            logging.info(f"Debugging Info for Query Index {_idx}:")
+            logging.info(f"Query: {query}")
+            logging.info(f"Retrieved Chunks (After Re-ranking):")
+            for chunk_idx, chunk in enumerate(retrieval_results):
+                logging.info(f"Chunk {chunk_idx + 1}: {chunk[:200]}...")  # Print first 200 characters
+            logging.info("-" * 80)
+
             batch_retrieval_results.append(retrieval_results)
 
         # Prepare formatted prompts for the LLM
@@ -325,14 +332,16 @@ class EnhancedRAGModel:
             references = ""
 
             if retrieval_results:
-                references += "Context:\n"
+                references += "### Context:\n"
                 for chunk in retrieval_results:
-                    references += f"{chunk.strip()}\n"
+                    references += f"- {chunk.strip()}\n"
 
+            # Truncate references if too long
             references = references[:MAX_CONTEXT_REFERENCES_LENGTH]
 
             user_message += f"{references}\n"
-            user_message += f"Question: {query}\n"
+            user_message += f"### Question:\n{query}\n"
+            user_message += "### Instructions:\nUsing only the information from the context provided above, answer the question as accurately and concisely as possible using the fewest words possible. There is NO NEED to explain the reasoning behind your answers. If the context does not contain enough information to answer the question, respond with \"I don't know.\". If the question is not well-defined or does not make sense, respond with \"invalid question.\""
 
             if self.is_server:
                 formatted_prompts.append(
@@ -342,15 +351,18 @@ class EnhancedRAGModel:
                     ]
                 )
             else:
-                formatted_prompts.append(
-                    self.tokenizer.apply_chat_template(
-                        [
-                            {"role": "system", "content": system_prompt},
-                            {"role": "user", "content": user_message},
-                        ],
-                        tokenize=False,
-                        add_generation_prompt=True,
-                    )
+                prompt = self.tokenizer.apply_chat_template(
+                    [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_message},
+                    ],
+                    tokenize=False,
+                    add_generation_prompt=True,
                 )
+                formatted_prompts.append(prompt)
+                # Add debugging message
+                logging.info(f"Formatted Prompt for Query Index {_idx} (Offline Mode):")
+                logging.info(prompt)
+                logging.info("-" * 80)
 
         return formatted_prompts

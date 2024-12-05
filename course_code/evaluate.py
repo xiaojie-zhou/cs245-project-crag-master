@@ -71,11 +71,6 @@ def evaluate_predictions(results, eval_model):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--dataset_path", type=str, default="example_data/dev_data.jsonl.bz2",
-                        choices=["example_data/dev_data.jsonl.bz2", # example data
-                                 "/data/crag_task_1_dev_v4_release.jsonl.bz2", # full data
-                                 ])
-
     parser.add_argument("--model_name", type=str, default="vanilla_baseline",
                         choices=["vanilla_baseline",
                                  "rag_baseline",
@@ -83,7 +78,7 @@ if __name__ == "__main__":
                                  "rag_enhanced"
                                  ],
                         )
-
+    parser.add_argument("--timestamp", type=str, default="0000-00_00:00:00")
     parser.add_argument("--gen_llm_name", type=str, default="meta-llama/Llama-3.2-3B-Instruct",
                         choices=["meta-llama/Llama-3.2-3B-Instruct",
                                  "meta-llama/Llama-3.2-1B-Instruct",
@@ -107,10 +102,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(args.is_server)
 
-    dataset_path = args.dataset_path
-    dataset = dataset_path.split("/")[0]
-    dataset_path = os.path.join("..", dataset_path)
-
     gen_llm_name = args.gen_llm_name.split("/")[-1]
     eval_llm_name = args.eval_llm_name
 
@@ -123,7 +114,7 @@ if __name__ == "__main__":
 
     # get output directory
     model_name = args.model_name
-    output_directory = os.path.join("..", "output", dataset, model_name, gen_llm_name)
+    output_directory = os.path.join("..", "output", model_name, gen_llm_name, args.timestamp)
     if not os.path.exists(output_directory):
         raise FileNotFoundError(f"Output directory {output_directory} does not exist.")
 
