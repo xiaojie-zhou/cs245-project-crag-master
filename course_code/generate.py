@@ -85,6 +85,7 @@ if __name__ == "__main__":
     parser.add_argument("--dataset_path", type=str, default="example_data/dev_data.jsonl.bz2",
                         choices=["example_data/dev_data.jsonl.bz2", # example data
                                  "../../../../data/crag_task_1_dev_v4_release.jsonl.bz2", # full data
+                                 "data/crag_task_1_dev_v4_release.jsonl.bz2"
                                  ])
     parser.add_argument("--split", type=int, default=-1,
                         help="The split of the dataset to use. This is only relevant for the full data: "
@@ -115,7 +116,8 @@ if __name__ == "__main__":
     print(args.is_server)
 
     dataset_path = args.dataset_path
-    dataset = dataset_path.split("/")[4]
+    #dataset = dataset_path.split("/")[4]
+    dataset = dataset_path.split("/")[0]
     split = -1
     if dataset == "data":
         split = args.split
