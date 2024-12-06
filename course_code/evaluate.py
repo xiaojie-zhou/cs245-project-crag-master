@@ -74,6 +74,7 @@ if __name__ == "__main__":
     parser.add_argument("--model_name", type=str, default="vanilla_baseline",
                         choices=["vanilla_baseline",
                                  "rag_baseline",
+                                 "file_levl_rag",
                                  # add your model here
                                  "rag_enhanced"
                                  ],
@@ -89,6 +90,8 @@ if __name__ == "__main__":
                         choices=["meta-llama/Llama-3.2-3B-Instruct",
                                  "meta-llama/Llama-3.2-1B-Instruct",
                                  "google/gemma-2-2b-it",
+                                 "meta-llama/Llama-3.2-1B-Instruct",
+                                 "meta-llama/Llama-3.1-8B-Instruct",
                                  # can add more llm models here
                                  ])
     parser.add_argument("--is_server", action="store_true", default=False,
