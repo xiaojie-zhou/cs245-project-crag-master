@@ -170,7 +170,7 @@ class EnhancedRAGModel:
 
         # Load a more powerful sentence transformer model
         self.sentence_model = SentenceTransformer(
-            "all-roberta-large-v1",  # Upgraded embedding model
+            "all-mpnet-base-v2",
             device=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
         )
 
@@ -332,16 +332,14 @@ class EnhancedRAGModel:
             references = ""
 
             if retrieval_results:
-                references += "### Context:\n"
+                references += "Context:\n"
                 for chunk in retrieval_results:
-                    references += f"- {chunk.strip()}\n"
+                    references += f"{chunk.strip()}\n"
 
-            # Truncate references if too long
             references = references[:MAX_CONTEXT_REFERENCES_LENGTH]
 
             user_message += f"{references}\n"
-            user_message += f"### Question:\n{query}\n"
-            user_message += "### Instructions:\nUsing only the information from the context provided above, answer the question as accurately and concisely as possible using the fewest words possible. There is NO NEED to explain the reasoning behind your answers. If the context does not contain enough information to answer the question, respond with \"I don't know.\". If the question is not well-defined or does not make sense, respond with \"invalid question.\""
+            user_message += f"Question: {query}\n"
 
             if self.is_server:
                 formatted_prompts.append(
