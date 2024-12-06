@@ -71,14 +71,21 @@ def evaluate_predictions(results, eval_model):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
+ 
+    parser.add_argument("--dataset_path", type=str, default="example_data/dev_data.jsonl.bz2",
+                        choices=["example_data/dev_data.jsonl.bz2", # example data
+                                 "../../../../data/crag_task_1_dev_v4_release.jsonl.bz2", # full data
+                                 "data/crag_task_1_dev_v4_release.jsonl.bz2"
+                                 ])
+
     parser.add_argument("--model_name", type=str, default="vanilla_baseline",
                         choices=["vanilla_baseline",
                                  "rag_baseline",
                                  "file_levl_rag",
+                                 "chunk_threshold",
                                  # add your model here
                                  "rag_enhanced"
-                                 ],
-                        )
+                                 ])
     parser.add_argument("--timestamp", type=str, default="0000-00_00:00:00")
     parser.add_argument("--gen_llm_name", type=str, default="meta-llama/Llama-3.2-3B-Instruct",
                         choices=["meta-llama/Llama-3.2-3B-Instruct",

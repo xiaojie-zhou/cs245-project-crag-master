@@ -167,7 +167,7 @@ class RAGModel:
                 trust_remote_code=True,
                 dtype="half",  # note: bfloat16 is not supported on nvidia-T4 GPUs
                 enforce_eager=True,
-                max_model_len=4096
+                max_model_len = 4096
             )
             self.tokenizer = self.llm.get_tokenizer()
 

@@ -109,6 +109,7 @@ if __name__ == "__main__":
                         choices=["example_data/dev_data.jsonl.bz2", # example data
                                  "data/crag_task_1_dev_v4_release.jsonl.bz2", # full data
                                  "../../../../data/crag_task_1_dev_v4_release.jsonl.bz2", # full data
+                                 "data/crag_task_1_dev_v4_release.jsonl.bz2"
                                  ])
     parser.add_argument("--split", type=int, default=-1,
                         help="The split of the dataset to use. This is only relevant for the full data: "
@@ -116,9 +117,10 @@ if __name__ == "__main__":
 
     parser.add_argument("--model_name", type=str, default="vanilla_baseline",
                         choices=["vanilla_baseline",
-                                 "rag_baseline",
-                                 "file_levl_rag"
-                                 # add your model here
+                                 "rag_baseline", 
+                                  # add your model here
+                                 "chunk_threshold",
+                                 "file_levl_rag",
                                  "rag_enhanced"
                                  ],
                         )
@@ -126,6 +128,8 @@ if __name__ == "__main__":
     parser.add_argument("--llm_name", type=str, default="meta-llama/Llama-3.2-3B-Instruct",
                         choices=["meta-llama/Llama-3.2-3B-Instruct",
                                  "meta-llama/Llama-3.2-1B-Instruct",
+                                 "meta-llama/Llama-3.2-8B-Instruct",
+                                 "meta-llama/Llama-3.2-11B-Vision-Instruct",
                                  "meta-llama/Llama-3.1-8B-Instruct",
                                  "google/gemma-2-2b-it",
                                  # can add more llm models here
@@ -157,6 +161,9 @@ if __name__ == "__main__":
         model = InstructModel(llm_name=llm_name, is_server=args.is_server, vllm_server=args.vllm_server)
     elif model_name == "rag_baseline":
         from rag_baseline import RAGModel
+        model = RAGModel(llm_name=llm_name, is_server=args.is_server, vllm_server=args.vllm_server)
+    elif model_name == "chunk_threshold":
+        from chunk_threshold import RAGModel
         model = RAGModel(llm_name=llm_name, is_server=args.is_server, vllm_server=args.vllm_server)
     elif model_name == "file_levl_rag":
         from file_levl_rag import RAGModel

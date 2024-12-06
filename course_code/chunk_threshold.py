@@ -33,6 +33,9 @@ VLLM_GPU_MEMORY_UTILIZATION = 0.85 # TUNE THIS VARIABLE depending on the number 
 # Sentence Transformer Parameters
 SENTENTENCE_TRANSFORMER_BATCH_SIZE = 32 # TUNE THIS VARIABLE depending on the size of your embedding model and GPU mem available
 
+# Chunk Similarity Threshold Parameter
+CHUNK_SIMILARITY_THRESHOLD_MULTIPLIER = float(os.getenv("THRESHOLD", 0.3))
+print("CHUNK_SIMILARITY_THRESHOLD_MULTIPLIER", CHUNK_SIMILARITY_THRESHOLD_MULTIPLIER)
 #### CONFIG PARAMETERS END---
 
 class ChunkExtractor:
@@ -166,7 +169,8 @@ class RAGModel:
                 gpu_memory_utilization=VLLM_GPU_MEMORY_UTILIZATION,
                 trust_remote_code=True,
                 dtype="half",  # note: bfloat16 is not supported on nvidia-T4 GPUs
-                enforce_eager=True
+                enforce_eager=True,
+                max_model_len = 4096
             )
             self.tokenizer = self.llm.get_tokenizer()
 
