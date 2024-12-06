@@ -7,6 +7,17 @@ import argparse
 from loguru import logger
 from tqdm.auto import tqdm
 
+import logging
+
+# Configure the root logger
+logging.basicConfig(
+    level=logging.INFO,  # Set to DEBUG to capture all levels of logs
+    format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+    handlers=[
+        logging.FileHandler("debug.log", mode='w'),  # Write logs to debug.log
+        logging.StreamHandler()
+    ]
+)
 
 def load_data_in_batches(dataset_path, batch_size, split=-1):
     """
@@ -72,6 +83,16 @@ def generate_predictions(dataset_path, model, split):
         batch_ground_truths = batch.pop("answer")  # Remove answers from batch and store them
         batch_predictions = model.batch_generate_answer(batch)
 
+        # Add debugging messages here
+        for idx in range(len(batch_predictions)):
+            query = batch["query"][idx]
+            ground_truth = batch_ground_truths[idx]
+            prediction = batch_predictions[idx]
+            logging.info(f"Debugging Info for Sample {len(queries) + idx}, Query: {query}:")
+            logging.info(f"Ground Truth: {ground_truth}")
+            logging.info(f"Prediction: {prediction}")
+            logging.info("=" * 80)
+
         queries.extend(batch["query"])
         ground_truths.extend(batch_ground_truths)
         predictions.extend(batch_predictions)
@@ -84,7 +105,9 @@ if __name__ == "__main__":
 
     parser.add_argument("--dataset_path", type=str, default="example_data/dev_data.jsonl.bz2",
                         choices=["example_data/dev_data.jsonl.bz2", # example data
+                                 "/data/crag_task_1_dev_v4_release.jsonl.bz2", # full data
                                  "../../../../data/crag_task_1_dev_v4_release.jsonl.bz2", # full data
+
                                  ])
     parser.add_argument("--split", type=int, default=-1,
                         help="The split of the dataset to use. This is only relevant for the full data: "
@@ -92,8 +115,8 @@ if __name__ == "__main__":
 
     parser.add_argument("--model_name", type=str, default="vanilla_baseline",
                         choices=["vanilla_baseline",
-                                 "rag_baseline"
-                                 # add your model here
+                                 "rag_baseline",
+                                 "rag_enhanced"
                                  ],
                         )
 
@@ -112,7 +135,7 @@ if __name__ == "__main__":
     print(args.is_server)
 
     dataset_path = args.dataset_path
-    dataset = dataset_path.split("/")[0]
+    dataset = dataset_path.split("/")[1]
     split = -1
     if dataset == "data":
         split = args.split
@@ -131,13 +154,18 @@ if __name__ == "__main__":
     elif model_name == "rag_baseline":
         from rag_baseline import RAGModel
         model = RAGModel(llm_name=llm_name, is_server=args.is_server, vllm_server=args.vllm_server)
-    # elif model_name == "your_model":
-    #     add your model here
+    elif model_name == "rag_enhanced":
+        from rag_enhanced import EnhancedRAGModel
+        model = EnhancedRAGModel(llm_name=llm_name, is_server=args.is_server, vllm_server=args.vllm_server)
     else:
         raise ValueError("Model name not recognized.")
 
     # make output directory
-    output_directory = os.path.join("..", "output", dataset, model_name, _llm_name)
+    import datetime
+
+    now = datetime.datetime.now()
+    timestamp = now.strftime("%Y-%m-%d_%H:%M:%S")
+    output_directory = os.path.join("..", "output", model_name, _llm_name, timestamp)
     os.makedirs(output_directory, exist_ok=True)
 
     # Generate predictions
